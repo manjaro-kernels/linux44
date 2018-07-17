@@ -11,9 +11,9 @@ pkgname=('linux44' 'linux44-headers')
 _kernelname=-MANJARO
 _basekernel=4.4
 _basever=44
-_aufs=20170410
+_aufs=20170911
 _bfq=v8r12
-_sub=140
+_sub=141
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -54,17 +54,17 @@ source=(#"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.
         '0003-zen-temp.patch'
         '0004-zen-temp.patch'
 )
-sha256sums=('184c8f3cde0caca0d2a15ee2b6ce47e3a5b57038bc15a65e631d6b340886c7bb'
+sha256sums=('918d4baa8ea3756f1cff7c83786fa2aded29ed4e86ffd2013c650ff23af9cb22'
             '0579d0c801502e7fb7d2682acfe8a243888afaa90b597871c112c7d0b00114a2'
             '20a0575f517554bdd7a3049f1563ba9265cf41eb81911adf462b161efc58a484'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
             '5016e07c4afa91866566f6812aa7a4c69537d3abf64076c0307863f45a491e77'
-            '7c20920e06f3735106790a3c9dabca44857d60f4a25c474b8187f864ae4ac704'
+            'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
             'eb0d1d2af199ee40cc6704e6b7bdcd43f17e7e635514501247c413806bce63ff'
             '31ba01590164e89cf275de5a9f2700c4044e79b1d880bafc0b1bfbcaf09ca37c'
-            'b6dbf4375b233590fb956c16689edb1ae1e66fa604a1ad536defe97e634df3fb'
-            '31ab9a3a628664ed85ad3cce3dc5e94a4ad1270d9925462ea0e50ab3698c53ce'
+            'c9ea8b99202e702f1d80394f6c5716eb78988f5663e714023e1f1d6ac01355da'
+            '34aa5e8a8c3b14d3bcf0312c66723375375a5b335eaea1299ac08b1c91d87b4d'
             'f626fb29eefbf9d002d3786174c1f97344e4d97604ae0dfe28f0516a8a4590b6'
             '0d8ecaa41661327d592c03bb20bf5f911a515e7caf35d457de4e802a55df4498'
             '6f7aa69101d690df2286dd2642a23bce835efab96273389b243dafbec15a1d0c'
