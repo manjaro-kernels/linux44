@@ -13,7 +13,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911
 _bfq=v8r12
-_sub=148
+_sub=149
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -22,10 +22,11 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 options=('!strip')
 source=(#"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        "https://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
+        #"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         #"https://www.kernel.org/pub/linux/kernel/v4.x/testing/linux-${_basekernel}.tar.xz"
         #"https://github.com/torvalds/linux/archive/v${_basekernel}.tar.gz"
         #"https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot/linux-${pkgver}.tar.gz
         # the main kernel config files
         'config' 'config.x86_64' 'config.aufs'
         # standard config files for mkinitcpio ramdisk
@@ -54,7 +55,7 @@ source=(#"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.
         '0003-zen-temp.patch'
         '0004-zen-temp.patch'
 )
-sha256sums=('19b10f009bb497a7e36995cc58811494f1cb46ae6ed02cc6d08babc97fc4d983'
+sha256sums=('4c48a397cc60773d7bf5421c9840e7cc1bb9d36dbd5ff71869b5bfbc99dcaefa'
             '0579d0c801502e7fb7d2682acfe8a243888afaa90b597871c112c7d0b00114a2'
             '931d7544728309ae7db4951cb8e469cd5ca7ada19d594ce5d0f5c48246018fc3'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
