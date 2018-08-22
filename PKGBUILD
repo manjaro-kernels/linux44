@@ -11,9 +11,9 @@ pkgname=('linux44' 'linux44-headers')
 _kernelname=-MANJARO
 _basekernel=4.4
 _basever=44
-_aufs=20170911
+_aufs=20170911 #last version
 _bfq=v8r12
-_sub=150
+_sub=151
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -21,12 +21,12 @@ url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
 options=('!strip')
-source=(#"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
+source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         #"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         #"https://www.kernel.org/pub/linux/kernel/v4.x/testing/linux-${_basekernel}.tar.xz"
         #"https://github.com/torvalds/linux/archive/v${_basekernel}.tar.gz"
-        #"https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
-        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot/linux-${pkgver}.tar.gz
+        "https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        #https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot/linux-${pkgver}.tar.gz
         # the main kernel config files
         'config' 'config.x86_64' 'config.aufs'
         # standard config files for mkinitcpio ramdisk
@@ -55,7 +55,8 @@ source=(#"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.
         '0003-zen-temp.patch'
         '0004-zen-temp.patch'
 )
-sha256sums=('354bcc561bb09b98f3c928d31219ea9290e48be14e4031a8e6bee65d755cb14c'
+sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
+            '32edfb2ed78595f9b2ce223850e7016dca5f8b0c8fc8fbf30d88f55564ae70fb'
             '0579d0c801502e7fb7d2682acfe8a243888afaa90b597871c112c7d0b00114a2'
             '931d7544728309ae7db4951cb8e469cd5ca7ada19d594ce5d0f5c48246018fc3'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -82,11 +83,11 @@ sha256sums=('354bcc561bb09b98f3c928d31219ea9290e48be14e4031a8e6bee65d755cb14c'
             '70cee696fb4204ac7f787cef0742c50637e8bb7f68e2c7bca01aeefff32affc8')
 
 prepare() {
-  mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
+  #mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
   # add upstream patch
-  #patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
