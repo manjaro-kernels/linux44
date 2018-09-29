@@ -73,11 +73,10 @@ index 2afcdbb..4d81c75 100644
  		inode_init_owner(inode, dir, mode);
  		inode->i_blocks = 0;
  		inode->i_atime = inode->i_mtime = inode->i_ctime = CURRENT_TIME;
-@@ -1465,6 +1475,25 @@ static struct inode *shmem_get_inode(struct super_block *sb, const struct inode
- 			mpol_shared_policy_init(&info->policy, NULL);
+@@ -2227,6 +2236,25 @@ static struct inode *shmem_get_inode(str
  			break;
  		}
-+
+ 
 +		if (!sbinfo->idr_nouse) {
 +			/* inum 0 and 1 are unused */
 +			mutex_lock(&sbinfo->idr_lock);
@@ -96,9 +95,10 @@ index 2afcdbb..4d81c75 100644
 +			}
 +		} else
 +			inode->i_ino = get_next_ino();
++
+ 		lockdep_annotate_inode_mutex_key(inode);
  	} else
  		shmem_free_inode(sb);
- 	return inode;
 @@ -2682,8 +2711,7 @@ static struct dentry *shmem_get_parent(struct dentry *child)
  static int shmem_match(struct inode *ino, void *vfh)
  {
