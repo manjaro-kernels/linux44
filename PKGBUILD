@@ -14,7 +14,9 @@ _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
 _sub=180
-pkgver=${_basekernel}.${_sub}
+_rc=181-rc1
+#pkgver=${_basekernel}.${_sub}
+pkgver=${_basekernel}.181
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -25,7 +27,9 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         #"https://www.kernel.org/pub/linux/kernel/v4.x/linux-${pkgver}.tar.xz"
         #"https://www.kernel.org/pub/linux/kernel/v4.x/testing/linux-${_basekernel}.tar.xz"
         #"https://github.com/torvalds/linux/archive/v${_basekernel}.tar.gz"
-        "https://cdn.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        #"http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${_basekernel}.${_sub}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-${_basekernel}.${_rc}.xz"
         #https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/snapshot/linux-${pkgver}.tar.gz
         # the main kernel config files
         'config' 'config.x86_64' 'config.aufs'
@@ -57,6 +61,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             'fe04b6270c8018fb05570662d46fdf4b1371431d690d94ac72607fe8d3a1dbf3'
+            '1516fd1fb623be29b4a753751039c1d049bdaeae195b3394fa435a9be88839b5'
             '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
             'ea022d5f57d31eb8055ef4472af9155cf4f606e3428ee06861143d71ad42f480'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -87,7 +92,9 @@ prepare() {
   cd "${srcdir}/linux-${_basekernel}"
 
   # add upstream patch
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  #patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "${srcdir}/patch-${_basekernel}.${_sub}"
+  patch -p1 -i "${srcdir}/patch-${_basekernel}.${_rc}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -139,7 +146,9 @@ prepare() {
   #patch -Np1 -i "${srcdir}/0002-block-introduce-the-BFQ-${_bfq}-I-O-sched.patch"
   #patch -Np1 -i "${srcdir}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-${_bfq}.patch"
   #patch -Np1 -i "${srcdir}/0004-block-bfq-update-migration-methods-attach-for-4.4-rc5-v7r8.patch"
-  sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = ${_sub}|g" "${srcdir}/0001-BFQ-${_bfq}.patch"
+  #sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = ${_sub}|g" "${srcdir}/0001-BFQ-${_bfq}.patch"
+  sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = $(echo ${_rc} | cut -d "-" -f1)|g" "${srcdir}/0001-BFQ-${_bfq}.patch"
+  sed -i -e "s|EXTRAVERSION =|EXTRAVERSION = -$(echo ${_rc} | cut -d "-" -f2)|1" "${srcdir}/0001-BFQ-${_bfq}.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
