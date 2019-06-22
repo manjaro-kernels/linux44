@@ -13,7 +13,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-_sub=182
+_sub=183
 _rc=
 pkgver=${_basekernel}.${_sub}
 #pkgver=${_basekernel}.181
@@ -53,6 +53,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-sdhci-revert.patch'
         'i8042-asus-notebook.patch'
         '0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch'
+        '0003-tcp-refine memory-limit-test-in-tcp_fragment.patch::https://github.com/torvalds/linux/commit/b6653b3629e5b88202be3c9abc44713973f5c4b4.patch'
         # Zen temperature
         '0001-zen-temp.patch'
         '0002-zen-temp.patch'
@@ -117,6 +118,9 @@ prepare() {
 
   # https://bugzilla.kernel.org/show_bug.cgi?id=199271
   patch -Np1 -i ../0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch
+
+  # https://github.com/ValveSoftware/steam-for-linux/issues/6326
+  patch -Np1 -i ../0003-tcp-refine memory-limit-test-in-tcp_fragment.patch
 
   # Add support for temperature sensors on Family 17h (Ryzen) processors.
   patch -Np1 -i "${srcdir}/0001-zen-temp.patch"
