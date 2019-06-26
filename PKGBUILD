@@ -53,7 +53,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-sdhci-revert.patch'
         'i8042-asus-notebook.patch'
         '0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch'
-        '0003-tcp-refine memory-limit-test-in-tcp_fragment.patch::https://github.com/torvalds/linux/commit/b6653b3629e5b88202be3c9abc44713973f5c4b4.patch'
+        #'0003-tcp-refine-memory-limit-test-in-tcp_fragment.patch::https://github.com/torvalds/linux/commit/b6653b3629e5b88202be3c9abc44713973f5c4b4.patch'
         # Zen temperature
         '0001-zen-temp.patch'
         '0002-zen-temp.patch'
@@ -61,7 +61,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            'd91f3236a431ec9a8834969cc4d7d8d9ea5ffa42e8d0c62cde12f3b6aa6fb58f'
+            'e005ec541eb5e03699b58c8ca388681670866e1aac87a3fa2d9a6b2408506718'
             '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
             'ea022d5f57d31eb8055ef4472af9155cf4f606e3428ee06861143d71ad42f480'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -119,8 +119,9 @@ prepare() {
   # https://bugzilla.kernel.org/show_bug.cgi?id=199271
   patch -Np1 -i ../0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch
 
+  # TODO: not backported yet!
   # https://github.com/ValveSoftware/steam-for-linux/issues/6326
-  patch -Np1 -i ../0003-tcp-refine memory-limit-test-in-tcp_fragment.patch
+  #patch -Np1 -i ../0003-tcp-refine-memory-limit-test-in-tcp_fragment.patch
 
   # Add support for temperature sensors on Family 17h (Ryzen) processors.
   patch -Np1 -i "${srcdir}/0001-zen-temp.patch"
