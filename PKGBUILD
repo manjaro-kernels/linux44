@@ -13,8 +13,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-_sub=188
-pkgver=4.4.188
+pkgver=4.4.189
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -53,7 +52,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '81ba64bbb7a5cf3f643d0b46725e963be51e0ef54d99d8274affac86d417b695'
+            '096c1b2abc213e910ea19f592a5c709a6a34ee0b07101fac9f762392df7d7a51'
             '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
             'ea022d5f57d31eb8055ef4472af9155cf4f606e3428ee06861143d71ad42f480'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -85,8 +84,6 @@ prepare() {
 
   # add upstream patch
   patch -p1 -i "${srcdir}/patch-${pkgver}"
-  #patch -p1 -i "${srcdir}/patch-${_basekernel}.${_sub}"
-  #patch -p1 -i "${srcdir}/patch-${_basekernel}.${_rc}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -136,15 +133,7 @@ prepare() {
   patch -Np1 -i "${srcdir}/vfs-ino.patch"
 
   # add BFQ scheduler
-  #sed -i -e 's|__GFP_WAIT|__GFP_DIRECT_RECLAIM|g' "${srcdir}/0002-block-introduce-the-BFQ-${_bfq}-I-O-sched.patch"
-  #sed -i -e 's|__GFP_WAIT|__GFP_DIRECT_RECLAIM|g' "${srcdir}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-${_bfq}.patch"
-  #patch -Np1 -i "${srcdir}/0001-block-cgroups-kconfig-build-bits-for-BFQ-${_bfq}.patch"
-  #patch -Np1 -i "${srcdir}/0002-block-introduce-the-BFQ-${_bfq}-I-O-sched.patch"
-  #patch -Np1 -i "${srcdir}/0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-${_bfq}.patch"
-  #patch -Np1 -i "${srcdir}/0004-block-bfq-update-migration-methods-attach-for-4.4-rc5-v7r8.patch"
-  sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = ${_sub}|g" "${srcdir}/0001-BFQ-${_bfq}.patch"
-  #sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = $(echo ${_rc} | cut -d "-" -f1)|g" "${srcdir}/0001-BFQ-${_bfq}.patch"
-  #sed -i -e "s|EXTRAVERSION =|EXTRAVERSION = -$(echo ${_rc} | cut -d "-" -f2)|1" "${srcdir}/0001-BFQ-${_bfq}.patch"
+  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
