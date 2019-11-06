@@ -198,6 +198,10 @@ package_linux44() {
   make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
   cp arch/$KARCH/boot/bzImage "${pkgdir}/boot/vmlinuz-${_basekernel}-${CARCH}"
 
+  # systemd expects to find the kernel here to allow hibernation
+  # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
+  ln -sr "/boot/vmlinuz-${_basekernel}-${CARCH}" "${pkgdir}/usr/lib/modules/${_kernver}/vmlinuz"
+
   # add kernel version
   if [ "${CARCH}" = "x86_64" ]; then
      echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
