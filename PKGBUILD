@@ -13,7 +13,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.219
+pkgver=4.4.220
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -49,7 +49,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '60a0db968b3dfb308639b6fa8ac426f2b578b325d61a8d5af55250b49e52c81f'
+            'fd90c02ccbdc8e1b1f580649a07900157d666dcc5573ffdfe19ea16065309f11'
             '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
             '1df6cbab75c9167d019ad69c954ad5edbe5fbe07554b780d672243b98fadc9ba'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -351,4 +351,4 @@ package_linux44-headers() {
   rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.select-break"
 }
 
-_server=cx51
+_server=cpx51
