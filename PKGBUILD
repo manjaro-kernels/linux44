@@ -13,7 +13,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.223
+pkgver=4.4.224
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -49,7 +49,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            'c5bf047c380e66f276153be2d84bf660c4906d805fd7ad5680e28afc79e94556'
+            '23dac6567d841f98fe3f9fa74219d5d602b7664aeb45f84d35dc54904478916a'
             '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
             '1df6cbab75c9167d019ad69c954ad5edbe5fbe07554b780d672243b98fadc9ba'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
@@ -77,7 +77,7 @@ prepare() {
   #mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
-  # add upstream patch
+  msg "add upstream patch"
   patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
@@ -85,39 +85,41 @@ prepare() {
   # enable only if you have "gen-stable-queue-patch.sh" executed before
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}-20161030"
 
+  msg "sdhci revert patch"
   # revert http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9faac7b95ea4f9e83b7a914084cc81ef1632fd91
   # fixes #47778 sdhci broken on some boards
   # https://bugzilla.kernel.org/show_bug.cgi?id=106541
   # https://github.com/manjaro/packages-core/issues/27
   patch -Rp1 -i "${srcdir}/0001-sdhci-revert.patch"
 
-  # set DEFAULT_CONSOLE_LOGLEVEL to 4 (same value as the 'quiet' kernel param)
+  msg "set DEFAULT_CONSOLE_LOGLEVEL to 4" # (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
   patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
 
-  # fix X455LB touchpad issue
+  msg "fix X455LB touchpad issue"
   # https://github.com/manjaro/packages-core/pull/39
   patch -p1 -i "${srcdir}/i8042-asus-notebook.patch"
 
+  msg "BTUSB_ATH30 patch"
   # https://bugzilla.kernel.org/show_bug.cgi?id=199271
-  patch -Np1 -i ../0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch
+  patch -Np1 -i "${srcdir}/0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch"
 
   # TODO: not backported yet!
   # https://github.com/ValveSoftware/steam-for-linux/issues/6326
   #patch -Np1 -i ../0003-tcp-refine-memory-limit-test-in-tcp_fragment.patch
 
-  # Add support for temperature sensors on Family 17h (Ryzen) processors.
+  msg "add support for temperature sensors on Family 17h (Ryzen) processors"
   patch -Np1 -i "${srcdir}/0001-zen-temp.patch"
   patch -Np1 -i "${srcdir}/0002-zen-temp.patch"
   patch -Np1 -i "${srcdir}/0003-zen-temp.patch"
   patch -Np1 -i "${srcdir}/0004-zen-temp.patch"
 
-  # add Gentoo patches
+  msg "Gentoo thinkpad patches"
   patch -Np1 -i "${srcdir}/1700_enable-thinkpad-micled.patch"
   patch -Np1 -i "${srcdir}/2700_ThinkPad-30-brightness-control-fix.patch"
 
-  # add aufs4 support
+  msg "add aufs4 support"
   patch -Np1 -i "${srcdir}/aufs4.4-${_aufs}.patch"
   patch -Np1 -i "${srcdir}/aufs4-base.patch"
   patch -Np1 -i "${srcdir}/aufs4-kbuild.patch"
@@ -127,7 +129,7 @@ prepare() {
   patch -Np1 -i "${srcdir}/tmpfs-idr.patch"
   patch -Np1 -i "${srcdir}/vfs-ino.patch"
 
-  # add BFQ scheduler
+  msg "add BFQ scheduler"
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
 
@@ -144,16 +146,16 @@ prepare() {
     sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
-  # set extraversion to pkgrel
+  msg "set extraversion to pkgrel"
   sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
 
-  # don't run depmod on 'make install'. We'll do this ourselves in packaging
+  msg "don't run depmod on 'make install'" # We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
 
   # normally not needed
   make clean
 
-  # get kernel version
+  msg "get kernel version"
   make prepare
 
   # load configuration
@@ -164,14 +166,14 @@ prepare() {
   #make oldconfig # using old config from previous kernel version
   # ... or manually edit .config
 
-  # rewrite configuration
+  msg "rewrite configuration"
   yes "" | make config >/dev/null
 }
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
 
-  # build!
+  msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
