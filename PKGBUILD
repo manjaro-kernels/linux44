@@ -353,4 +353,4 @@ package_linux44-headers() {
   rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.select-break"
 }
 
-_server=cx51
+_server=cpx51
