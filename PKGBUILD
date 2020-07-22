@@ -1,10 +1,12 @@
-# Based on the file created for Arch Linux by:
+# Maintainer: Philip Müller <philm[at]manjaro[dot]org>
+# Maintainer: Helmut Stult <helmut[at]manjaro[dot]org>
+
+# Arch credits:
 # Tobias Powalowski <tpowa@archlinux.org>
 # Thomas Baechler <thomas@archlinux.org>
 
-# Maintainer: Philip Müller <philm@manjaro.org>
-# Maintainer: Guinux <guillaume@manjaro.org>
-# Maintainer: Rob McCathie <rob@manjaro.org>
+# Cloud Server
+_server=cpx51
 
 pkgbase=linux44
 pkgname=('linux44' 'linux44-headers')
@@ -13,9 +15,9 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.230
+pkgver=4.4.231
 pkgrel=1
-arch=('i686' 'x86_64')
+arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
@@ -23,7 +25,7 @@ options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
-        'config' 'config.x86_64' 'config.aufs'
+        'config' 'config.aufs'
         # AUFS Patches
         "aufs4.4-${_aufs}.patch.bz2"
         'aufs4-base.patch'
@@ -42,7 +44,6 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-sdhci-revert.patch'
         'i8042-asus-notebook.patch'
         '0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch'
-        'linux44-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch::https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/plain/releases/4.4.228/ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch'
         # Zen temperature
         '0001-zen-temp.patch'
         '0002-zen-temp.patch'
@@ -50,9 +51,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '1b2c56271dab850a6a78f17b219e5aeea66cb2e62a59026954ee28b1a1811015'
-            '97f23dbf61c89120d052aa97f3e1cf3997505c02f974804ff198247f00fa5cb7'
-            '1df6cbab75c9167d019ad69c954ad5edbe5fbe07554b780d672243b98fadc9ba'
+            '7f36fc926be4373d63cdbae269d1335c089a52432e302b70891d13e8df49b4b8'
+            '5043a056176ee9101095223a79a5811f4c60f5a81f922b4668882d12137231f6'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
             'eb0d1d2af199ee40cc6704e6b7bdcd43f17e7e635514501247c413806bce63ff'
@@ -69,7 +69,6 @@ sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             '5313df7cb5b4d005422bd4cd0dae956b2dadba8f3db904275aaf99ac53894375'
             '6f836c7ede51db88504fee33e228af368b1b6cb08f3dc7536849945f595a6758'
             '61abfab9093bdfec4edda3586fd05afe2f488a92ca99cff51c36b359acdcc815'
-            'd3f4d509de5e53c89fdaee0a5a473f623c5d47ce453836491d84ba7a8e17394a'
             '4d55d497f1c3ebc7afa82909c3fc63a37855d1753b4cd7dfdbaac21d91fe6968'
             'ee46e4c25b58d1dbd7db963382cf37aeae83dd0b4c13a59bdd11153dc324d8e8'
             'cd463af7193bcf864c42e95d804976a627ac11132886f25e04dfc2471c28bf6c'
@@ -86,10 +85,6 @@ prepare() {
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
   # enable only if you have "gen-stable-queue-patch.sh" executed before
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}-20161030"
-
-  msg "ath9k revert patch"
-  # https://forum.manjaro.org/t/testing-update-2020-06-26-kernels-mesa-20-1-2-haskell/150212/22
-  patch -Rp1 -i "${srcdir}/linux44-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch"
 
   msg "sdhci revert patch"
   # revert http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9faac7b95ea4f9e83b7a914084cc81ef1632fd91
@@ -139,12 +134,8 @@ prepare() {
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
 
-  if [ "${CARCH}" = "x86_64" ]; then
-    cat "${srcdir}/config.x86_64" > ./.config
-  else
-    cat "${srcdir}/config" > ./.config
-  fi
-
+  cat "${srcdir}/config" > ./.config
+ 
   cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
@@ -200,11 +191,7 @@ package_linux44() {
   make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
 
   # add kernel version
-  if [ "${CARCH}" = "x86_64" ]; then
-     echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
-  else
-     echo "${pkgver}-${pkgrel}-MANJARO x32" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
-  fi
+  echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
 
   # remove build and source links
   rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
@@ -273,10 +260,6 @@ package_linux44-headers() {
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel"
 
   cp arch/${KARCH}/Makefile "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/"
-
-  if [ "${CARCH}" = "i686" ]; then
-    cp arch/${KARCH}/Makefile_32.cpu "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/"
-  fi
 
   cp arch/${KARCH}/kernel/asm-offsets.s "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel/"
 
@@ -358,5 +341,3 @@ package_linux44-headers() {
   rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.recursion-issue-02"
   rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.select-break"
 }
-
-_server=cpx51
