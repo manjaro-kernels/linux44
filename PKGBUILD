@@ -15,7 +15,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.235
+pkgver=4.4.236
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -51,7 +51,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0004-zen-temp.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '9cb5be8c320e2fb1cce95203f861fb2b4accafffd4059aeca643027ba6137b4c'
+            '9db287a9f6521c7aeaf7571a42432a7e60e503db24595c8c137f61470d49f5df'
             '5043a056176ee9101095223a79a5811f4c60f5a81f922b4668882d12137231f6'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
