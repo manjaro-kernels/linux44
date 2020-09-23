@@ -1,4 +1,5 @@
 # Maintainer: Philip Müller <philm[at]manjaro[dot]org>
+# Maintainer: Bernhard Landauer <bernhard[at]manjaro[dot]org>
 # Maintainer: Helmut Stult <helmut[at]manjaro[dot]org>
 
 # Arch credits:
@@ -15,7 +16,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.236
+pkgver=4.4.237
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -45,14 +46,17 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         'i8042-asus-notebook.patch'
         '0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch'
         # Zen temperature
-        '0001-zen-temp.patch'
-        '0002-zen-temp.patch'
-        '0003-zen-temp.patch'
-        '0004-zen-temp.patch'
+        '1101-zen-temp.patch'
+        '1102-zen-temp.patch'
+        '1103-zen-temp.patch'
+        '1104-zen-temp.patch'
+        # Bootsplash
+        '0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
+        '0402-revert-fbcon-remove-soft-scrollback-code.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '9db287a9f6521c7aeaf7571a42432a7e60e503db24595c8c137f61470d49f5df'
-            '5043a056176ee9101095223a79a5811f4c60f5a81f922b4668882d12137231f6'
+            '50968e83d8bdb665cb8ab2343a98e6109824891cf9fce6f5c539486ff4175121'
+            '6d2c9ff66b36011ce952cd96f9e4c58120eb479e17fbaf6621f7f32832ce2b52'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
             'eb0d1d2af199ee40cc6704e6b7bdcd43f17e7e635514501247c413806bce63ff'
@@ -72,7 +76,9 @@ sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             '4d55d497f1c3ebc7afa82909c3fc63a37855d1753b4cd7dfdbaac21d91fe6968'
             'ee46e4c25b58d1dbd7db963382cf37aeae83dd0b4c13a59bdd11153dc324d8e8'
             'cd463af7193bcf864c42e95d804976a627ac11132886f25e04dfc2471c28bf6c'
-            '70cee696fb4204ac7f787cef0742c50637e8bb7f68e2c7bca01aeefff32affc8')
+            '70cee696fb4204ac7f787cef0742c50637e8bb7f68e2c7bca01aeefff32affc8'
+            'e716028c39d9c0149dc78242fcecefbb301dd11eb6de30e88fc6a50186352043'
+            '6bd3f4863b5154989133142eb54e5098dbd27d478e192c2447593830253bd961')
 
 prepare() {
   #mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
@@ -111,10 +117,10 @@ prepare() {
   #patch -Np1 -i ../0003-tcp-refine-memory-limit-test-in-tcp_fragment.patch
 
   msg "add support for temperature sensors on Family 17h (Ryzen) processors"
-  patch -Np1 -i "${srcdir}/0001-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/0002-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/0003-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/0004-zen-temp.patch"
+  patch -Np1 -i "${srcdir}/1101-zen-temp.patch"
+  patch -Np1 -i "${srcdir}/1102-zen-temp.patch"
+  patch -Np1 -i "${srcdir}/1103-zen-temp.patch"
+  patch -Np1 -i "${srcdir}/1104-zen-temp.patch"
 
   msg "Gentoo thinkpad patches"
   patch -Np1 -i "${srcdir}/1700_enable-thinkpad-micled.patch"
@@ -134,8 +140,12 @@ prepare() {
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
 
+  msg "add bootsplash"
+  patch -Np1 -i "${srcdir}/0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  patch -Np1 -i "${srcdir}/0402-revert-fbcon-remove-soft-scrollback-code.patch"
+
+  msg2 "add config.aufs to config"
   cat "${srcdir}/config" > ./.config
- 
   cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
@@ -146,7 +156,8 @@ prepare() {
   msg "set extraversion to pkgrel"
   sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
 
-  msg "don't run depmod on 'make install'" # We'll do this ourselves in packaging
+  msg "don't run depmod on 'make install'"
+  # We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
 
   # normally not needed
