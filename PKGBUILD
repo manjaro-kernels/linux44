@@ -16,7 +16,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.248
+pkgver=4.4.249
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -55,8 +55,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0402-revert-fbcon-remove-soft-scrollback-code.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '255ccbc19fc6bcb3f56225f512dc292b9ae5984132ffb092bac209f112e94528'
-            '1bc28ff6bc2a151294983b1a87db045add3f7307ac4c04839ad0f93e2bd21fe5'
+            '28c12e09b5637200301e357aa80b654b60b30a5709a62e060c8fde42e7da531a'
+            '48cf848c1ae19b7e0c3b1a374b2e784d2cbdefecc94c6018217a897f4d80fceb'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
             'eb0d1d2af199ee40cc6704e6b7bdcd43f17e7e635514501247c413806bce63ff'
