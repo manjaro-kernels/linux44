@@ -17,7 +17,7 @@ _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
 pkgver=4.4.268
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -56,7 +56,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             'e37b782d9e8c38063d18c216b82f9a1e1b3ce3d7f12f1b2bec2d9be8ddfbc23a'
-            '459e1161716dc027b14d0b22840382921ae43964e0776419f83698aae3e170e3'
+            '810778518fc17090a4794dece929eaeca77b9ccdc8c4e1aa206504c8efa28007'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
             'eb0d1d2af199ee40cc6704e6b7bdcd43f17e7e635514501247c413806bce63ff'
