@@ -21,7 +21,18 @@ pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
+makedepends=('bc'
+    'docbook-xsl'
+    'libelf'
+    'pahole'
+    'git'
+    'inetutils'
+    'kmod'
+    'xmlto'
+    'cpio'
+    'perl'
+    'tar'
+    'xz')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
@@ -223,9 +234,6 @@ package_linux44() {
   mkdir -p "${pkgdir}/usr"
   mv "${pkgdir}/lib" "${pkgdir}/usr/"
 
-  # add vmlinux
-  install -D -m644 vmlinux "${pkgdir}/usr/lib/modules/${_kernver}/build/vmlinux"
-
   # systemd expects to find the kernel here to allow hibernation
   # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
   cp arch/$KARCH/boot/bzImage "${pkgdir}/usr/lib/modules/${_kernver}/vmlinuz"
@@ -329,26 +337,28 @@ package_linux44-headers() {
     cp ${i} "${pkgdir}/usr/lib/modules/${_kernver}/build/${i}"
   done
 
-  chown -R root.root "${pkgdir}/usr/lib/modules/${_kernver}/build"
-  find "${pkgdir}/usr/lib/modules/${_kernver}/build" -type d -exec chmod 755 {} \;
+  # remove documentation files
+  rm -r "${_builddir}/Documentation"
 
   # strip scripts directory
-  find "${pkgdir}/usr/lib/modules/${_kernver}/build/scripts" -type f -perm -u+w 2>/dev/null | while read binary ; do
-    case "$(file -bi "${binary}")" in
-      *application/x-sharedlib*) # Libraries (.so)
-        /usr/bin/strip ${STRIP_SHARED} "${binary}";;
-      *application/x-archive*) # Libraries (.a)
-        /usr/bin/strip ${STRIP_STATIC} "${binary}";;
-      *application/x-executable*) # Binaries
-        /usr/bin/strip ${STRIP_BINARIES} "${binary}";;
+  local file
+  while read -rd '' file; do
+    case "$(file -bi "$file")" in
+      application/x-sharedlib\;*)      # Libraries (.so)
+        strip $STRIP_SHARED "$file" ;;
+      application/x-archive\;*)        # Libraries (.a)
+        strip $STRIP_STATIC "$file" ;;
+      application/x-executable\;*)     # Binaries
+        strip $STRIP_BINARIES "$file" ;;
+      application/x-pie-executable\;*) # Relocatable binaries
+        strip $STRIP_SHARED "$file" ;;
     esac
-  done
+  done < <(find "${_builddir}" -type f -perm -u+x ! -name vmlinux -print0 2>/dev/null)
+  strip $STRIP_STATIC "${_builddir}/vmlinux"
+  
+  # remove unwanted files
+  find ${_builddir} -name '*.orig' -delete
 
-  # remove unneeded architectures
-  rm -rf "${pkgdir}"/usr/lib/modules/${_kernver}/build/arch/{alpha,arc,arm,arm26,arm64,avr32,blackfin,c6x,cris,frv,h8300,hexagon,ia64,m32r,m68k,m68knommu,metag,mips,microblaze,mn10300,openrisc,parisc,powerpc,ppc,s390,score,sh,sh64,sparc,sparc64,tile,unicore32,um,v850,xtensa}
-
-  # remove a files already in linux-docs package
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.recursion-issue-01"
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.recursion-issue-02"
-  rm -f "${pkgdir}/usr/lib/modules/${_kernver}/build/Documentation/kbuild/Kconfig.select-break"
+  # Fix permissions
+  chmod -R u=rwX,go=rX "${_builddir}"
 }
