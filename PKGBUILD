@@ -92,16 +92,11 @@ sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             'c7a98d9a39d5f0c9c4f8b3cf6c44fc67683696253fb16825397af30061931c96')
 
 prepare() {
-  #mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
   msg "add upstream patch"
   patch -p1 -i "${srcdir}/patch-${pkgver}"
 
-  # add latest fixes from stable queue, if needed
-  # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-  # enable only if you have "gen-stable-queue-patch.sh" executed before
-  #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}-20161030"
 
   msg "sdhci revert patch"
   # revert http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9faac7b95ea4f9e83b7a914084cc81ef1632fd91
@@ -210,29 +205,7 @@ package_linux44() {
   _kernver="$(make LOCALVERSION= kernelrelease)"
 
   mkdir -p "${pkgdir}"/{lib/modules,lib/firmware,boot}
-  make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}" modules_install
-
-  # add kernel version
-  echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
-
-  # remove build and source links
-  rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
-  # remove the firmware
-  rm -rf "${pkgdir}/lib/firmware"
-  # gzip -9 all modules to save 100MB of space
-  find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
-  # make room for external modules
-  ln -s "../extramodules-${_basekernel}${_kernelname:--MANJARO}" "${pkgdir}/lib/modules/${_kernver}/extramodules"
-  # add real version for building modules and running depmod from post_install/upgrade
-  mkdir -p "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--MANJARO}"
-  echo "${_kernver}" > "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--MANJARO}/version"
-
-  # Now we call depmod...
-  depmod -b "${pkgdir}" -F System.map "${_kernver}"
-
-  # move module tree /lib -> /usr/lib
-  mkdir -p "${pkgdir}/usr"
-  mv "${pkgdir}/lib" "${pkgdir}/usr/"
+  make LOCALVERSION= INSTALL_MOD_PATH="${pkgdir}/usr" INSTALL_MOD_STRIP=1 modules_install
 
   # systemd expects to find the kernel here to allow hibernation
   # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
@@ -241,10 +214,35 @@ package_linux44() {
   # Used by mkinitcpio to name the kernel
   echo "${pkgbase}" | install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_kernver}/pkgbase"
   echo "${_basekernel}-${CARCH}" | install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_kernver}/kernelbase"
+
+  # add kernel version
+  echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
+
+  # make room for external modules
+  ln -s "../extramodules-${_basekernel}${_kernelname:--MANJARO}" "${pkgdir}/lib/modules/${_kernver}/extramodules"
+
+  # add real version for building modules and running depmod from post_install/upgrade
+  mkdir -p "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--MANJARO}"
+  echo "${_kernver}" > "${pkgdir}/lib/modules/extramodules-${_basekernel}${_kernelname:--MANJARO}/version"
+  # remove build and source links
+  rm -f "${pkgdir}"/lib/modules/${_kernver}/{source,build}
+  # remove the firmware
+  rm -rf "${pkgdir}/lib/firmware"
+  # gzip -9 all modules to save 100MB of space
+  find "${pkgdir}" -name '*.ko' -exec gzip -9 {} \;
+
+  # now we call depmod...
+  depmod -b "${pkgdir}" -F System.map "${_kernver}"
+
+  # move module tree /lib -> /usr/lib
+  mkdir -p "${pkgdir}/usr"
+  mv "${pkgdir}/lib" "${pkgdir}/usr/"
+
 }
 
 package_linux44-headers() {
   pkgdesc="Header files and scripts for building modules for ${pkgbase/linux/Linux} kernel"
+  depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
