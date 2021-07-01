@@ -17,14 +17,25 @@ _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
 pkgver=4.4.274
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
-url="http://www.kernel.org/"
+url="https://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc')
+makedepends=('bc'
+    'docbook-xsl'
+    'libelf'
+    'pahole'
+    'git'
+    'inetutils'
+    'kmod'
+    'xmlto'
+    'cpio'
+    'perl'
+    'tar'
+    'xz')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config' 'config.aufs'
         # AUFS Patches
@@ -81,19 +92,14 @@ sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             'c7a98d9a39d5f0c9c4f8b3cf6c44fc67683696253fb16825397af30061931c96')
 
 prepare() {
-  #mv "${srcdir}/linux-${pkgver}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
   msg "add upstream patch"
   patch -p1 -i "${srcdir}/patch-${pkgver}"
 
-  # add latest fixes from stable queue, if needed
-  # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-  # enable only if you have "gen-stable-queue-patch.sh" executed before
-  #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}-20161030"
 
   msg "sdhci revert patch"
-  # revert http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9faac7b95ea4f9e83b7a914084cc81ef1632fd91
+  # revert https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=9faac7b95ea4f9e83b7a914084cc81ef1632fd91
   # fixes #47778 sdhci broken on some boards
   # https://bugzilla.kernel.org/show_bug.cgi?id=106541
   # https://github.com/manjaro/packages-core/issues/27
@@ -146,6 +152,7 @@ prepare() {
 
   msg2 "add config.aufs to config"
   cat "${srcdir}/config" > ./.config
+
   cat "${srcdir}/config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
@@ -193,8 +200,6 @@ package_linux44() {
 
   cd "${srcdir}/linux-${_basekernel}"
 
-  KARCH=x86
-
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
 
@@ -223,12 +228,9 @@ package_linux44() {
   mkdir -p "${pkgdir}/usr"
   mv "${pkgdir}/lib" "${pkgdir}/usr/"
 
-  # add vmlinux
-  install -D -m644 vmlinux "${pkgdir}/usr/lib/modules/${_kernver}/build/vmlinux"
-
   # systemd expects to find the kernel here to allow hibernation
   # https://github.com/systemd/systemd/commit/edda44605f06a41fb86b7ab8128dcf99161d2344
-  cp arch/$KARCH/boot/bzImage "${pkgdir}/usr/lib/modules/${_kernver}/vmlinuz"
+  cp arch/x86/boot/bzImage "${pkgdir}/usr/lib/modules/${_kernver}/vmlinuz"
 
   # Used by mkinitcpio to name the kernel
   echo "${pkgbase}" | install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_kernver}/pkgbase"
@@ -237,6 +239,7 @@ package_linux44() {
 
 package_linux44-headers() {
   pkgdesc="Header files and scripts for building modules for ${pkgbase/linux/Linux} kernel"
+  depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
@@ -268,11 +271,11 @@ package_linux44-headers() {
   chmod og-w -R "${pkgdir}/usr/lib/modules/${_kernver}/build/scripts"
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/.tmp_versions"
 
-  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel"
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/x86/kernel"
 
-  cp arch/${KARCH}/Makefile "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/"
+  cp arch/x86/Makefile "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/x86/"
 
-  cp arch/${KARCH}/kernel/asm-offsets.s "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/${KARCH}/kernel/"
+  cp arch/x86/kernel/asm-offsets.s "${pkgdir}/usr/lib/modules/${_kernver}/build/arch/x86/kernel/"
 
   # add docbook makefile
   install -D -m644 Documentation/DocBook/Makefile \
@@ -290,19 +293,23 @@ package_linux44-headers() {
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/net/mac80211/"
   cp net/mac80211/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/net/mac80211/"
 
+  # add vmlinux
+  msg2 "add vmlinux"
+  install -D -m644 vmlinux "${pkgdir}/usr/lib/modules/${_kernver}/build/vmlinux"
+
   # add dvb headers for external modules
   # in reference to:
-  # http://bugs.archlinux.org/task/9912
+  # https://bugs.archlinux.org/task/9912
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core"
   cp drivers/media/dvb-core/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-core/"
   # and...
-  # http://bugs.archlinux.org/task/11194
+  # https://bugs.archlinux.org/task/11194
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/include/config/dvb/"
   cp include/config/dvb/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/include/config/dvb/"
 
-  # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
+  # add dvb headers for https://mcentral.de/hg/~mrec/em28xx-new
   # in reference to:
-  # http://bugs.archlinux.org/task/13146
+  # https://bugs.archlinux.org/task/13146
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
   cp drivers/media/dvb-frontends/lgdt330x.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/i2c/"
@@ -310,13 +317,17 @@ package_linux44-headers() {
 
   # add dvb headers
   # in reference to:
-  # http://bugs.archlinux.org/task/20402
+  # https://bugs.archlinux.org/task/20402
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb"
   cp drivers/media/usb/dvb-usb/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/usb/dvb-usb/"
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends"
   cp drivers/media/dvb-frontends/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/dvb-frontends/"
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners"
   cp drivers/media/tuners/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/media/tuners/"
+
+  # https://bugs.archlinux.org/task/71392
+  mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/iio/common/hid-sensors"
+  cp drivers/iio/common/hid-sensors/*.h "${pkgdir}/usr/lib/modules/${_kernver}/build/drivers/iio/common/hid-sensors/"
 
   # add xfs and shmem for aufs building
   mkdir -p "${pkgdir}/usr/lib/modules/${_kernver}/build/fs/xfs/libxfs"
