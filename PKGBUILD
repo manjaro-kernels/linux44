@@ -1,5 +1,4 @@
 # Maintainer: Philip Müller <philm[at]manjaro[dot]org>
-# Maintainer: Bernhard Landauer <bernhard[at]manjaro[dot]org>
 # Maintainer: Helmut Stult <helmut[at]manjaro[dot]org>
 
 # Arch credits:
@@ -16,7 +15,7 @@ _basekernel=4.4
 _basever=44
 _aufs=20170911 #last version
 _bfq=v8r12
-pkgver=4.4.276
+pkgver=4.4.277
 pkgrel=1
 arch=('x86_64')
 url="https://www.kernel.org/"
@@ -66,7 +65,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0402-revert-fbcon-remove-soft-scrollback-code.patch'
 )
 sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
-            '58da9bf0108ee73f55d480e2b7b4e431ea7c4b0cae4b66677cf2a2bf0e6af360'
+            '0f8b0052ac4db23c0a1c3fe561a0d30f0e5b386aa3063e119d9c9fae7b50e1da'
             '7ae5515abb6936f3e0debbfd25a6e211a5e5388f0dcfbe498447cd4931fbfb7d'
             'd1cecc720df66c70f43bdb86e0169d6b756161c870db8d7d39c32c04dc36ed36'
             'd2588221dd9f975f1ba939016eb6004d5a53ed3bf0682750046883852b7ee520'
@@ -92,10 +91,10 @@ sha256sums=('401d7c8fef594999a460d10c72c5a94e9c2e1022f16795ec51746b0d165418b2'
             'c7a98d9a39d5f0c9c4f8b3cf6c44fc67683696253fb16825397af30061931c96')
 
 prepare() {
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   msg "add upstream patch"
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "../patch-${pkgver}"
 
 
   msg "sdhci revert patch"
@@ -103,57 +102,57 @@ prepare() {
   # fixes #47778 sdhci broken on some boards
   # https://bugzilla.kernel.org/show_bug.cgi?id=106541
   # https://github.com/manjaro/packages-core/issues/27
-  patch -Rp1 -i "${srcdir}/0001-sdhci-revert.patch"
+  patch -Rp1 -i "../0001-sdhci-revert.patch"
 
   msg "set DEFAULT_CONSOLE_LOGLEVEL to 4" # (same value as the 'quiet' kernel param)
   # remove this when a Kconfig knob is made available by upstream
   # (relevant patch sent upstream: https://lkml.org/lkml/2011/7/26/227)
-  patch -p1 -i "${srcdir}/change-default-console-loglevel.patch"
+  patch -p1 -i "../change-default-console-loglevel.patch"
 
   msg "fix X455LB touchpad issue"
   # https://github.com/manjaro/packages-core/pull/39
-  patch -p1 -i "${srcdir}/i8042-asus-notebook.patch"
+  patch -p1 -i "../i8042-asus-notebook.patch"
 
   msg "BTUSB_ATH30 patch"
   # https://bugzilla.kernel.org/show_bug.cgi?id=199271
-  patch -Np1 -i "${srcdir}/0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch"
+  patch -Np1 -i "../0002-Bluetooth-btusb-Apply-QCQ_ROME-setup-for-BTUSB_ATH30.patch"
 
   # TODO: not backported yet!
   # https://github.com/ValveSoftware/steam-for-linux/issues/6326
   #patch -Np1 -i ../0003-tcp-refine-memory-limit-test-in-tcp_fragment.patch
 
   msg "add support for temperature sensors on Family 17h (Ryzen) processors"
-  patch -Np1 -i "${srcdir}/1101-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/1102-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/1103-zen-temp.patch"
-  patch -Np1 -i "${srcdir}/1104-zen-temp.patch"
+  patch -Np1 -i "../1101-zen-temp.patch"
+  patch -Np1 -i "../1102-zen-temp.patch"
+  patch -Np1 -i "../1103-zen-temp.patch"
+  patch -Np1 -i "../1104-zen-temp.patch"
 
   msg "Gentoo thinkpad patches"
-  patch -Np1 -i "${srcdir}/1700_enable-thinkpad-micled.patch"
-  patch -Np1 -i "${srcdir}/2700_ThinkPad-30-brightness-control-fix.patch"
+  patch -Np1 -i "../1700_enable-thinkpad-micled.patch"
+  patch -Np1 -i "../2700_ThinkPad-30-brightness-control-fix.patch"
 
   msg "add aufs4 support"
-  patch -Np1 -i "${srcdir}/aufs4.4-${_aufs}.patch"
-  patch -Np1 -i "${srcdir}/aufs4-base.patch"
-  patch -Np1 -i "${srcdir}/aufs4-kbuild.patch"
-  patch -Np1 -i "${srcdir}/aufs4-loopback.patch"
-  patch -Np1 -i "${srcdir}/aufs4-mmap.patch"
-  patch -Np1 -i "${srcdir}/aufs4-standalone.patch"
-  patch -Np1 -i "${srcdir}/tmpfs-idr.patch"
-  patch -Np1 -i "${srcdir}/vfs-ino.patch"
+  patch -Np1 -i "../aufs4.4-${_aufs}.patch"
+  patch -Np1 -i "../aufs4-base.patch"
+  patch -Np1 -i "../aufs4-kbuild.patch"
+  patch -Np1 -i "../aufs4-loopback.patch"
+  patch -Np1 -i "../aufs4-mmap.patch"
+  patch -Np1 -i "../aufs4-standalone.patch"
+  patch -Np1 -i "../tmpfs-idr.patch"
+  patch -Np1 -i "../vfs-ino.patch"
 
   msg "add BFQ scheduler"
-  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}.patch"
-  patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}.patch"
+  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}.patch"
+  patch -Np1 -i "../0001-BFQ-${_bfq}.patch"
 
   msg "add bootsplash"
-  patch -Np1 -i "${srcdir}/0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  patch -Np1 -i "${srcdir}/0402-revert-fbcon-remove-soft-scrollback-code.patch"
+  patch -Np1 -i "../0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  patch -Np1 -i "../0402-revert-fbcon-remove-soft-scrollback-code.patch"
 
   msg2 "add config.aufs to config"
-  cat "${srcdir}/config" > ./.config
+  cat "../config" > ./.config
 
-  cat "${srcdir}/config.aufs" >> ./.config
+  cat "../config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -186,7 +185,7 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
@@ -198,7 +197,7 @@ package_linux44() {
   optdepends=('crda: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}")
 
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
@@ -244,7 +243,7 @@ package_linux44-headers() {
 
   install -dm755 "${pkgdir}/usr/lib/modules/${_kernver}"
 
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
   install -D -m644 Makefile \
     "${pkgdir}/usr/lib/modules/${_kernver}/build/Makefile"
   install -D -m644 kernel/Makefile \
