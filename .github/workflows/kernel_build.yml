@@ -1,5 +1,3 @@
-# This is a basic workflow to help you get started with Actions
-
 name: kernel_build
 
 on:
@@ -8,10 +6,8 @@ on:
 jobs:
   install dependencies:
     runs-on: ubuntu-20.04
-
     steps:
-      - id: Install dependencies
-        shell: bash
+      - name: Install dependencies
         run: |
         sudo apt-get update
         sudo apt-get install \
@@ -43,8 +39,7 @@ jobs:
           python3-pip
         sudo pip3 install meson
         sudo pip3 install ninja
-    - id: install-pacman
-      shell: bash
+    - name: install-pacman
       env:
         PACMAN_VERSION: 6.0.0
       run: |
@@ -69,8 +64,7 @@ jobs:
           sudo mkdir -p /etc/pacman.d
           sudo touch /etc/pacman.d/mirrorlist
         popd
-    - id: install-keyrings
-      shell: bash
+    - name: install-keyrings
       run: |
         sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
         pushd manjaro-keyring
@@ -88,8 +82,7 @@ jobs:
         popd
         sudo pacman-key --init
         sudo pacman-key --populate archlinux manjaro
-    - id: install-manjaro-chrootbuild
-      shell: bash
+    - name: install-manjaro-chrootbuild
       run: |
         sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
         pushd manjaro-chrootbuild
