@@ -9,42 +9,42 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-        sudo apt-get update
-        sudo apt-get install \
-          gdisk \
-          zip \
-          systemd-container \
-          bmap-tools \
-          asciidoc \
-          libarchive-tools \
-          git \
-          build-essential \
-          cmake \
-          libarchive-dev \
-          pkg-config \
-          libcurl4-openssl-dev \
-          libgpgme-dev \
-          libssl-dev \
-          fakeroot \
-          dh-autoreconf \
-          haveged \
-          os-prober \
-          kwalify \
-          dosfstools \
-          libisoburn1 \
-          squashfs-tools \
-          docbook2x \
-          mktorrent \
-          doxygen \
-          python3-pip
-        sudo pip3 install meson
-        sudo pip3 install ninja
-    - name: install-pacman
-      env:
-        PACMAN_VERSION: 6.0.0
-      run: |
-        sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
-        pushd pacman
+          sudo apt-get update
+          sudo apt-get install \
+            gdisk \
+            zip \
+            systemd-container \
+            bmap-tools \
+            asciidoc \
+            libarchive-tools \
+            git \
+            build-essential \
+            cmake \
+            libarchive-dev \
+            pkg-config \
+            libcurl4-openssl-dev \
+            libgpgme-dev \
+            libssl-dev \
+            fakeroot \
+            dh-autoreconf \
+            haveged \
+            os-prober \
+            kwalify \
+            dosfstools \
+            libisoburn1 \
+            squashfs-tools \
+            docbook2x \
+            mktorrent \
+            doxygen \
+            python3-pip
+          sudo pip3 install meson
+          sudo pip3 install ninja
+      - name: install-pacman
+        env:
+          PACMAN_VERSION: 6.0.0
+        run: |
+          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
+          pushd pacman
           sudo wget https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.xz
           sudo tar -xvf pacman-${PACMAN_VERSION}.tar.xz
           pushd pacman-${PACMAN_VERSION}
@@ -63,29 +63,29 @@ jobs:
           sudo install -m644 makepkg.conf /etc/
           sudo mkdir -p /etc/pacman.d
           sudo touch /etc/pacman.d/mirrorlist
-        popd
-    - name: install-keyrings
-      run: |
-        sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
-        pushd manjaro-keyring
-        sudo install -dm755 /usr/share/pacman/keyrings/
-        sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
-        sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
-        sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
-        popd
+          popd
+      - name: install-keyrings
+        run: |
+          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
+          pushd manjaro-keyring
+          sudo install -dm755 /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+          popd
         
-        sudo git clone --depth 1 https://gitlab.archlinux.org/archlinux/archlinux-keyring.git
-        pushd archlinux-keyring
-        sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
-        sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
-        sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
-        popd
-        sudo pacman-key --init
-        sudo pacman-key --populate archlinux manjaro
-    - name: install-manjaro-chrootbuild
-      run: |
-        sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
-        pushd manjaro-chrootbuild
-        sudo ./install.sh
-        popd
-        echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
+          sudo git clone --depth 1 https://gitlab.archlinux.org/archlinux/archlinux-keyring.git
+          pushd archlinux-keyring
+          sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
+          sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
+          sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
+          popd
+          sudo pacman-key --init
+          sudo pacman-key --populate archlinux manjaro
+      - name: install-manjaro-chrootbuild
+        run: |
+          sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
+          pushd manjaro-chrootbuild
+          sudo ./install.sh
+          popd
+          echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
