@@ -9,7 +9,6 @@ jobs:
     steps:
       - name: install dependencies
         run: |
-          KERNEL=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)
           echo "building kernel ${KERNEL}"
           sudo apt-get update
           sudo apt-get install \
@@ -92,7 +91,8 @@ jobs:
           popd
       - name: checkout repo
         run: |
-          sudo git clone https://github.com/manjaro-kernels/${KERNEL}.git 
+          echo "KERNEL=$(echo "$GITHUB_REPOSITORY" | cut -d/ -f2)" >>$GITHUB_ENV
+          sudo git clone https://github.com/manjaro-kernels/${{ env.KERNEL }}.git 
       - name: build kernel
         run: |
-          sudo chrootbuild -np ${KERNEL}
+          sudo chrootbuild -np ${{ env.KERNEL }}
