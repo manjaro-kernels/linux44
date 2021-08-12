@@ -88,4 +88,13 @@ jobs:
           pushd manjaro-chrootbuild
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
-          
+  build_kernel:
+    runs-on: ubuntu-20.04
+    needs: install_dependencies
+    steps:
+      - name: Build Kernel
+        env:
+          KERNEL: linux44
+        uses: actions/checkout@2.3.4
+        run: |
+          sudo chrootbuild -np ${KERNEL}
