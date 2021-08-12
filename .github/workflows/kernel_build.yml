@@ -3,6 +3,8 @@ name: kernel_build
 on:
   workflow_dispatch:
 
+echo "KERNEL=linux44" >>$GITHUB_ENV
+
 jobs:
   build_kernel:
     runs-on: ubuntu-20.04
@@ -89,10 +91,8 @@ jobs:
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
       - name: checkout repo
-        env:
-          KERNEL: linux44
         run: |
-          sudo git clone https://github.com/manjaro-kernels/${KERNEL}.git 
+          sudo git clone https://github.com/manjaro-kernels/${{ env.KERNEL }}.git 
       - name: build kernel
         run: |
-          sudo chrootbuild -np ${KERNEL}
+          sudo chrootbuild -np ${{ env.KERNEL }}
