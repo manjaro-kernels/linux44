@@ -87,7 +87,7 @@ jobs:
           sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
           pushd manjaro-chrootbuild
           sudo ./install.sh
+          popd
           sudo su
           echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
           exit
-          popd
