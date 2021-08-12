@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  install dependencies:
+  install_dependencies:
     runs-on: ubuntu-20.04
     steps:
       - name: Install dependencies
