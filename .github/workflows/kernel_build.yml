@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  install_dependencies:
+  build_kernel:
     runs-on: ubuntu-20.04
     steps:
-      - name: Install dependencies
+      - name: install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install \
@@ -39,7 +39,7 @@ jobs:
             python3-pip
           sudo pip3 install meson
           sudo pip3 install ninja
-      - name: install-pacman
+      - name: install pacman
         env:
           PACMAN_VERSION: 6.0.0
         run: |
@@ -64,7 +64,7 @@ jobs:
           sudo mkdir -p /etc/pacman.d
           sudo touch /etc/pacman.d/mirrorlist
           popd
-      - name: install-keyrings
+      - name: install keyrings
         run: |
           sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
           pushd manjaro-keyring
@@ -82,18 +82,15 @@ jobs:
           popd
           sudo pacman-key --init
           sudo pacman-key --populate archlinux manjaro
-      - name: install-manjaro-chrootbuild
+      - name: install manjaro-chrootbuild
         run: |
           sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
           pushd manjaro-chrootbuild
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
-  build_kernel:
-    runs-on: ubuntu-20.04
-    needs: install_dependencies
-    steps:
+      - name: checkout repo
       - uses: actions/checkout@v2.3.4
-      - name: Build Kernel
+      - name: build kernel
         env:
           KERNEL: linux44
         run: |
