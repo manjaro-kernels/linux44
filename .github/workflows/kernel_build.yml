@@ -90,6 +90,9 @@ jobs:
           popd
       - name: checkout repo
         run: |
+          echo "1: ${{ github.repository }}"
+          echo "2: ${GITHUB_REPOSITORY}"
+          echo "3: ${{ env.GITHUB_REPOSITORY }}"
           echo "KERNEL=$(echo '${{ github.repository }}' | cut -d/ -f2)" >>$GITHUB_ENV
           sudo git clone https://github.com/manjaro-kernels/${{ env.KERNEL }}.git 
       - name: build kernel
