@@ -88,11 +88,8 @@ jobs:
           pushd manjaro-chrootbuild
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
-      - name: checkout repo
-        run: |
-          KERNEL="$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)"
-          echo "KERNEL=${KERNEL}"
-          sudo git clone https://github.com/manjaro-kernels/linux44.git 
       - name: build kernel
         run: |
-          sudo chrootbuild -np linux44
+          KERNEL="$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)"
+          sudo git clone https://github.com/manjaro-kernels/${KERNEL}.git
+          sudo chrootbuild -np {KERNEL}
