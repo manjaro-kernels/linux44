@@ -91,7 +91,7 @@ jobs:
       - name: checkout repo
         run: |
           KERNEL=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)"
-          echo "KERNEL=${KERNEL}
+          echo "KERNEL=${KERNEL}"
           sudo git clone https://github.com/manjaro-kernels/linux44.git 
       - name: build kernel
         run: |
