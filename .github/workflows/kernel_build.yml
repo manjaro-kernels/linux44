@@ -3,8 +3,6 @@ name: kernel_build
 on:
   workflow_dispatch:
 
-echo "KERNEL=linux44" >>$GITHUB_ENV
-
 jobs:
   build_kernel:
     runs-on: ubuntu-20.04
@@ -92,6 +90,7 @@ jobs:
           popd
       - name: checkout repo
         run: |
+          echo "KERNEL=linux44" >>$GITHUB_ENV
           sudo git clone https://github.com/manjaro-kernels/${{ env.KERNEL }}.git 
       - name: build kernel
         run: |
