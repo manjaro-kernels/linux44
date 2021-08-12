@@ -84,8 +84,9 @@ jobs:
           sudo pacman-key --populate archlinux manjaro
       - name: install-manjaro-chrootbuild
         run: |
-          sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
+          sudo su
+          git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
           pushd manjaro-chrootbuild
-          sudo ./install.sh
+          ./install.sh
           popd
-          sudo echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
+          echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
