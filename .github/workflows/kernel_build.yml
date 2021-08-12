@@ -88,8 +88,22 @@ jobs:
           pushd manjaro-chrootbuild
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
-      - name: build kernel
+      - id: vars
         run: |
           KERNEL="$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)"
-          sudo git clone https://github.com/manjaro-kernels/${KERNEL}.git
-          sudo chrootbuild -np {KERNEL}
+      - name: clone repo
+        run: |
+          sudo git clone https://github.com/manjaro-kernels/${{ steps.vars.KERNEL }}.git
+      - name: build kernel
+        run: |
+          sudo chrootbuild -np ${{ steps.vars.KERNEL }}
+      - name: publish kernel
+        shell: bash -O extglob {0}
+        run: |
+          _ver=$(grep ^pkgver= ${{ steps.vars.KERNEL }}/PKGBUILD | cut -d'=' -f2)
+          _rel=$(grep ^pkgrel= ${{ steps.vars.KERNEL }}/PKGBUILD | cut -d'=' -f2)
+          _tag=${_ver}-${_rel}
+          echo ${{ github.token }} | gh auth login --with-token
+          gh release create ${_tag} --title ${_tag} --repo ${{ github.repository }} --notes "automated release" || echo "release already exists"
+          GITHUB_LINK=https://github.com/${GITHUB_REPOSITORY}/releases/download/${_tag}
+          gh release upload ${_tag} --repo ${{ github.repository }} --clobber ./*.pkg.tar.*
