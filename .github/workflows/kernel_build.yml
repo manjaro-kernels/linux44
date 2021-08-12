@@ -88,4 +88,4 @@ jobs:
           pushd manjaro-chrootbuild
           sudo ./install.sh
           popd
-          echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
+          sudo echo "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>" >> /etc/makepkg.conf
