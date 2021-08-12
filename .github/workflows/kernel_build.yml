@@ -89,7 +89,7 @@ jobs:
           sudo ./install.sh "PACKAGER = <Manjaro Build Servere> <build@manjaro.org>"
           popd
       - name: checkout repo
-      - uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2.3.4
       - name: build kernel
         env:
           KERNEL: linux44
